@@ -1,0 +1,49 @@
+# ============================================================
+# 演示 / 验收 profile：H2 内存库 + 固定验证码 + 模拟支付 + 估算页数
+#   mvn spring-boot:run -Dspring-boot.run.profiles=demo
+# 数据随进程重启清空，仅用于演示与自动化测试，切勿用于生产。
+# ============================================================
+spring:
+  datasource:
+    url: jdbc:h2:mem:printsys;DB_CLOSE_DELAY=-1;MODE=MySQL;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  h2:
+    console:
+      enabled: false
+
+printsys:
+  storage-dir: ${STORAGE_DIR:./data/uploads-demo}
+  agent:
+    token: agent-dev-token
+  auth:
+    demo-mode: true
+    demo-code: "123456"
+    idle-minutes: 120
+    admin:
+      username: admin
+      password: admin123
+  sms:
+    provider: log
+  convert:
+    # 演示机通常没装 LibreOffice，降级为估算页数保证流程可跑通
+    enabled: false
+    allow-estimate: true
+  order:
+    expire-minutes: 30
+  task:
+    claim-timeout-minutes: 5
+  pay:
+    mock-enabled: true
+    public-base-url: ${PUBLIC_BASE_URL:http://localhost:8080}
+
+logging:
+  level:
+    com.printsys: INFO
+  file:
+    name: ${LOG_DIR:./logs}/print-system-demo.log

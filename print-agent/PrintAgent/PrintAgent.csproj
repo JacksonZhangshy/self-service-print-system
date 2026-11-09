@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>PrintAgent</AssemblyName>
+    <RootNamespace>PrintAgent</RootNamespace>
+    <Version>1.1.0</Version>
+    <Product>自助收费打印系统 · 打印助手</Product>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <!-- 无第三方依赖，restore 可离线完成（见 nuget.config） -->
+    <SatelliteResourceLanguages>zh-Hans;en</SatelliteResourceLanguages>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- 示例配置随发布一起拷出，方便现场改名 -->
+    <None Update="agent.example.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,136 @@
+# ============================================================
+# 自助收费打印系统 · 生产配置（默认 profile：MySQL）
+# 所有敏感项通过环境变量注入，切勿写死在仓库里（见 .env.example）
+# ============================================================
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /
+  tomcat:
+    max-http-form-post-size: 2MB
+
+spring:
+  application:
+    name: print-system
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:print_system}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:}
+    hikari:
+      maximum-pool-size: 15
+      minimum-idle: 2
+      connection-timeout: 10000
+  jpa:
+    hibernate:
+      ddl-auto: none          # 生产由 schema-mysql.sql 建表
+    open-in-view: false       # 查询都在 service 事务内完成，避免连接被视图层长期占用
+    show-sql: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Asia/Shanghai
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 110MB
+  jackson:
+    time-zone: Asia/Shanghai
+    date-format: yyyy-MM-dd HH:mm:ss
+  mvc:
+    # 让未匹配路径走 404 而不是被异常处理器吞成 500
+    throw-exception-if-no-handler-found: false
+
+printsys:
+  storage-dir: ${STORAGE_DIR:/opt/printsys/data/uploads}
+
+  agent:
+    # 打印助手共享密钥：生产必须替换为 32 位以上随机串
+    token: ${AGENT_TOKEN:}
+
+  auth:
+    demo-mode: ${DEMO_MODE:false}
+    demo-code: "123456"
+    session-ttl-hours: ${SESSION_TTL_HOURS:12}
+    # 公共电脑关键防护：无操作超过该分钟数自动登出
+    idle-minutes: ${IDLE_MINUTES:15}
+    admin:
+      username: ${ADMIN_USERNAME:admin}
+      # 仅首次启动用于创建管理员，入库即 BCrypt 散列，之后请登录管理端改密
+      password: ${ADMIN_PASSWORD:}
+
+  sms:
+    provider: ${SMS_PROVIDER:log}       # log / aliyun / tencent / webhook
+    code-ttl-minutes: 5
+    resend-seconds: 60
+    max-per-hour-per-phone: 10
+    max-per-hour-per-ip: 30
+    max-verify-attempts: 5
+    code-salt: ${SMS_CODE_SALT:printsys}
+    aliyun:
+      access-key-id: ${ALIYUN_ACCESS_KEY_ID:}
+      access-key-secret: ${ALIYUN_ACCESS_KEY_SECRET:}
+      sign-name: ${ALIYUN_SMS_SIGN_NAME:}
+      template-code: ${ALIYUN_SMS_TEMPLATE_CODE:}
+      endpoint: https://dysmsapi.aliyuncs.com
+    tencent:
+      secret-id: ${TENCENT_SECRET_ID:}
+      secret-key: ${TENCENT_SECRET_KEY:}
+      sdk-app-id: ${TENCENT_SMS_SDK_APP_ID:}
+      sign-name: ${TENCENT_SMS_SIGN_NAME:}
+      template-id: ${TENCENT_SMS_TEMPLATE_ID:}
+      region: ${TENCENT_SMS_REGION:ap-guangzhou}
+    webhook:
+      url: ${SMS_WEBHOOK_URL:}
+      token: ${SMS_WEBHOOK_TOKEN:}
+
+  convert:
+    # 开启后上传时用 LibreOffice 转 PDF，按真实页数计价（生产必须开启）
+    enabled: ${CONVERT_ENABLED:true}
+    soffice-path: ${SOFFICE_PATH:}
+    timeout-seconds: 180
+    allow-estimate: ${CONVERT_ALLOW_ESTIMATE:false}
+
+  order:
+    expire-minutes: ${ORDER_EXPIRE_MINUTES:10}
+    max-pages: ${MAX_PAGES:500}
+
+  task:
+    claim-timeout-minutes: ${TASK_CLAIM_TIMEOUT_MINUTES:15}
+    max-retry: ${TASK_MAX_RETRY:2}
+
+  refund:
+    auto-on-print-failure: ${AUTO_REFUND_ON_FAILURE:true}
+
+  file:
+    retention-days: ${FILE_RETENTION_DAYS:7}
+    max-mb: ${FILE_MAX_MB:100}
+
+  pay:
+    # 生产必须为 false：为 true 时任何人可把「模拟单」标记为已支付
+    mock-enabled: ${PAY_MOCK_ENABLED:false}
+    public-base-url: ${PUBLIC_BASE_URL:https://print.example.com}
+    alipay:
+      enabled: ${ALIPAY_ENABLED:true}
+      app-id: ${ALIPAY_APP_ID:}
+      private-key: ${ALIPAY_PRIVATE_KEY:}
+      alipay-public-key: ${ALIPAY_PUBLIC_KEY:}
+      seller-id: ${ALIPAY_SELLER_ID:}
+      gateway: ${ALIPAY_GATEWAY:https://openapi.alipay.com/gateway.do}
+    wechat:
+      enabled: ${WECHAT_ENABLED:true}
+      app-id: ${WECHAT_APP_ID:}
+      mch-id: ${WECHAT_MCH_ID:}
+      api-v3-key: ${WECHAT_API_V3_KEY:}
+      merchant-serial-no: ${WECHAT_MERCHANT_SERIAL_NO:}
+      private-key: ${WECHAT_PRIVATE_KEY:}
+      platform-certs: ${WECHAT_PLATFORM_CERTS:}
+
+logging:
+  level:
+    com.printsys: INFO
+  file:
+    name: ${LOG_DIR:/opt/printsys/logs}/print-system.log
+  logback:
+    rollingpolicy:
+      max-file-size: 20MB
+      max-history: 14

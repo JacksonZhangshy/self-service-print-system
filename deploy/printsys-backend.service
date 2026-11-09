@@ -1,0 +1,53 @@
+# ============================================================
+# 自助收费打印系统 · 后端 systemd 服务
+# 安装：
+#   sudo cp deploy/printsys-backend.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now printsys-backend
+# 日志：journalctl -u printsys-backend -f
+# ============================================================
+[Unit]
+Description=Print System Backend (Spring Boot)
+Documentation=https://print.example.com
+After=network-online.target mysql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=printsys
+Group=printsys
+WorkingDirectory=/opt/printsys/backend
+
+# 环境变量统一放这里，权限 600、属主 root（见 deploy/env.example）
+EnvironmentFile=/opt/printsys/.env
+
+ExecStart=/usr/bin/java \
+    -XX:MaxRAMPercentage=60 \
+    -XX:+UseG1GC \
+    -XX:+HeapDumpOnOutOfMemoryError \
+    -XX:HeapDumpPath=/opt/printsys/logs \
+    -Duser.timezone=Asia/Shanghai \
+    -Dfile.encoding=UTF-8 \
+    -jar /opt/printsys/backend/print-system.jar
+
+# 优雅停机：等 Spring 把在途请求处理完（默认 30s，与 server.shutdown=graceful 配套）
+KillSignal=SIGTERM
+TimeoutStopSec=40
+Restart=always
+RestartSec=5
+SuccessExitStatus=143
+
+# 安全加固：除数据/日志/临时目录外全部只读
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/printsys/data /opt/printsys/logs
+# LibreOffice 转换需要 /tmp 可写（PrivateTmp 已提供独立 tmp）
+LimitNOFILE=65535
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=printsys
+
+[Install]
+WantedBy=multi-user.target

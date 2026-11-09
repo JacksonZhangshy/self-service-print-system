@@ -1,0 +1,61 @@
+# ---------- Java / Maven ----------
+backend/target/
+*.class
+*.jar
+!backend/.mvn/wrapper/maven-wrapper.jar
+*.log
+hs_err_pid*
+replay_pid*
+
+# ---------- 前端 ----------
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ---------- .NET ----------
+print-agent/**/bin/
+print-agent/**/obj/
+print-agent/**/publish/
+*.user
+*.suo
+.vs/
+
+# ---------- 运行时产物 ----------
+logs/
+backend/logs/
+data/
+uploads/
+*.h2.db
+*.mv.db
+print-agent/**/logs/
+
+# ---------- 配置与密钥（绝不入库） ----------
+.env
+*.env
+!.env.example
+agent.json
+!agent.example.json
+*.pem
+*.p12
+*.pfx
+*.jks
+secrets/
+
+# ---------- 打包与临时 ----------
+*.zip
+*.tar.gz
+*.tmp
+*.part
+.workbuddy/
+.DS_Store
+Thumbs.db
+
+# ---------- IDE ----------
+.idea/
+*.iml
+out/
+.vscode/
+!.vscode/extensions.json
