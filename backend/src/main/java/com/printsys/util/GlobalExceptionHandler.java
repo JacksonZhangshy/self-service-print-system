@@ -69,6 +69,26 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(405, "请求方法不支持"));
     }
 
+    /**
+     * 路径不存在应回 404。若不单独处理，会被下面的兜底 handler 当作系统异常回 500，
+     * 且每来一个（含扫描器探测）就打一整套堆栈，日志很快被刷满。
+     */
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNoResource(
+            org.springframework.web.servlet.resource.NoResourceFoundException e) {
+        log.debug("路径不存在: {}", e.getResourcePath());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(404, "接口不存在"));
+    }
+
+    @ExceptionHandler(org.springframework.web.servlet.NoHandlerFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNoHandler(
+            org.springframework.web.servlet.NoHandlerFoundException e) {
+        log.debug("路径不存在: {} {}", e.getHttpMethod(), e.getRequestURL());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(404, "接口不存在"));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleOther(Exception e) {
         log.error("未处理异常", e);

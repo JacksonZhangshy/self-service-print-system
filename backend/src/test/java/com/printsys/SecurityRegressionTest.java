@@ -85,4 +85,21 @@ class SecurityRegressionTest {
                 "订单号必须转义，不能原样输出到 HTML");
         org.junit.jupiter.api.Assertions.assertTrue(html.contains("&lt;img"));
     }
+
+    /**
+     * 不存在的路径必须回 404（而不是 500），否则扫描器探测会污染日志与告警。
+     * 注意：/api/** 下的未知路径会先被鉴权拦截回 401 —— 这是有意的（不泄露路由是否存在），
+     * 因此这里用非 /api 前缀的路径验证 404 分支。
+     */
+    @Test
+    void unknownPathReturns404() throws Exception {
+        mvc.perform(get("/health"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value(404));
+        mvc.perform(get("/nothing-here/abc"))
+                .andExpect(status().isNotFound());
+        // 未登录访问未知 /api 路径：鉴权先行，回 401 而非 404
+        mvc.perform(get("/api/not-exists-at-all"))
+                .andExpect(status().isUnauthorized());
+    }
 }
