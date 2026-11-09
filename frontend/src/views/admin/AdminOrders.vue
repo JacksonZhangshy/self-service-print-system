@@ -1,5 +1,5 @@
 <template>
-  <div class="page">
+  <div class="page page-xwide">
     <div class="page-wide">
       <div class="card">
         <div class="toolbar">
@@ -20,32 +20,28 @@
           <el-button type="primary" @click="search">查询</el-button>
         </div>
 
-        <el-table :data="list" v-loading="loading" size="small" empty-text="暂无数据">
-          <el-table-column prop="orderNo" label="订单号" width="180" show-overflow-tooltip>
+        <el-table :data="list" v-loading="loading" size="small" empty-text="暂无数据" :fit="false">
+          <el-table-column prop="orderNo" label="订单号" width="186" show-overflow-tooltip>
             <template #default="{ row }"><span class="mono">{{ row.orderNo }}</span></template>
           </el-table-column>
-          <el-table-column label="状态" width="92">
+          <el-table-column label="状态" width="88">
             <template #default="{ row }">
               <span class="chip" :class="'chip-' + orderStatus(row.status).tone">
                 {{ orderStatus(row.status).label }}
               </span>
             </template>
           </el-table-column>
-          <el-table-column prop="userPhone" label="手机号" width="118" />
-          <el-table-column prop="fileName" label="文件" min-width="150" show-overflow-tooltip />
-          <el-table-column label="规格" width="150">
+          <el-table-column prop="userPhone" label="手机号" width="114" />
+          <el-table-column prop="fileName" label="文件" width="164" show-overflow-tooltip />
+          <el-table-column label="规格 / 页数" width="168">
             <template #default="{ row }">
-              {{ COLOR_LABEL[row.colorMode] }}{{ row.paperSize }}
-              {{ DUPLEX_LABEL[row.duplex] }}
+              {{ COLOR_LABEL[row.colorMode] }}{{ row.paperSize }}{{ DUPLEX_LABEL[row.duplex] }}
+              <div class="hint">
+                {{ row.pageCount }} 页 × {{ row.copies }} 份<i v-if="row.pageSource === 'ESTIMATE'" class="est" title="页数为估算值">*</i>
+              </div>
             </template>
           </el-table-column>
-          <el-table-column label="页数×份" width="92" align="right">
-            <template #default="{ row }">
-              <span class="mono">{{ row.pageCount }}×{{ row.copies }}</span>
-              <i v-if="row.pageSource === 'ESTIMATE'" class="est" title="页数为估算值">*</i>
-            </template>
-          </el-table-column>
-          <el-table-column label="金额" width="92" align="right">
+          <el-table-column label="金额" width="96" align="right">
             <template #default="{ row }">
               <span class="mono">¥{{ money(row.amount) }}</span>
               <div v-if="row.refundAmount" class="hint mono">退 ¥{{ money(row.refundAmount) }}</div>
@@ -58,13 +54,10 @@
               <div class="hint" v-if="row.payMode === 'MOCK'">模拟</div>
             </template>
           </el-table-column>
-          <el-table-column prop="terminalId" label="终端" width="88">
-            <template #default="{ row }">{{ row.terminalId || '-' }}</template>
-          </el-table-column>
-          <el-table-column label="下单时间" width="146">
+          <el-table-column label="下单时间" width="152">
             <template #default="{ row }"><span class="hint">{{ dt(row.createdAt) }}</span></template>
           </el-table-column>
-          <el-table-column label="操作" width="150" fixed="right">
+          <el-table-column label="操作" width="148" fixed="right">
             <template #default="{ row }">
               <el-button link type="primary" size="small" @click="openDetail(row)">详情</el-button>
               <el-button

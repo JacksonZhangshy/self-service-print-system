@@ -1,5 +1,5 @@
 <template>
-  <div class="page">
+  <div class="page page-xwide">
     <div class="page-wide">
       <div class="card">
         <div class="toolbar">

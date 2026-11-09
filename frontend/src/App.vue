@@ -18,7 +18,7 @@
         </template>
       </nav>
       <div class="right">
-        <span class="idle-hint" v-if="loggedIn">{{ idleLeft }} 秒后自动退出</span>
+        <span class="idle-hint" v-if="loggedIn">{{ idleHint }}</span>
         <button v-if="loggedIn" class="btn-ghost" @click="logout">退出登录</button>
       </div>
     </header>
@@ -44,6 +44,13 @@ const idleLeft = ref(0)
 const terminalId = ref('')
 
 const loggedIn = computed(() => !!(userToken.value || adminToken.value))
+// 公共电脑上的倒计时：小于两分钟按秒提示，否则按分钟，避免出现「7198 秒」
+const idleHint = computed(() => {
+  const s = idleLeft.value
+  if (s <= 0) return ''
+  if (s > 120) return `约 ${Math.ceil(s / 60)} 分钟后自动退出`
+  return s <= 60 ? `${s} 秒后自动退出` : `约 ${Math.ceil(s / 60)} 分钟后自动退出`
+})
 const isAdmin = computed(() => !!adminToken.value && route.path.startsWith('/admin'))
 const homePath = computed(() => (localStorage.getItem('adminToken') ? '/admin/dashboard' : '/user/print'))
 
@@ -149,6 +156,10 @@ body {
 .btn-ghost:hover { border-color: #c8c8cd; }
 .main { flex: 1; padding: 28px 20px 60px; }
 .page { max-width: 960px; margin: 0 auto; }
+/* 管理端宽表格页：在 .page 基础上放宽，容纳多列订单/任务表 */
+.page.page-xwide { max-width: 1340px; }
+/* 管理端宽表格页：不受 .page 的 960px 限制 */
+.page-wide { max-width: 1320px; margin: 0 auto; }
 .card {
   background: #fff; border: 1px solid var(--line); border-radius: 14px;
   padding: 24px; margin-bottom: 18px;

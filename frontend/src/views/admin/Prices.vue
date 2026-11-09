@@ -4,7 +4,7 @@
       <h2>收费标准</h2>
       <p class="sub">
         总价 = 单价（彩色模式 × 纸张）× 页数 × 份数 ×（双面 ? 双面系数 : 1），再与最低消费取大。
-        修改后对**新订单**立即生效，已下单订单金额不变。
+        修改后对新订单立即生效，已下单订单金额不变。
       </p>
 
       <el-form label-position="top" style="max-width: 620px" v-loading="loading">

@@ -9,7 +9,7 @@
 
       <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px">
         <span class="sub" style="margin: 0">应付金额</span>
-        <strong class="mono" style="font-size: 30px; font-weight: 600">¥{{ order.amount }}</strong>
+        <strong class="mono" style="font-size: 30px; font-weight: 600">¥{{ money(order.amount) }}</strong>
       </div>
       <p class="sub mono" style="margin-top: 0">
         订单号 {{ order.orderNo }}
@@ -39,10 +39,14 @@
 
       <!-- 待支付 -->
       <div v-else>
-        <el-radio-group v-model="method" :disabled="!!qrUrl" style="margin: 10px 0 16px">
+        <!-- 未出二维码时可选渠道；出码后渠道锁定，改成一句话说明，避免一个禁用的选择器让人误以为可以改 -->
+        <el-radio-group v-if="!qrUrl" v-model="method" style="margin: 10px 0 16px">
           <el-radio-button value="ALIPAY">支付宝</el-radio-button>
           <el-radio-button value="WECHAT">微信支付</el-radio-button>
         </el-radio-group>
+        <p v-else class="sub" style="margin: 0 0 12px">
+          支付方式：<b>{{ PAY_METHOD_LABEL[method] }}</b>（重新选择请关闭订单后重新下单）
+        </p>
 
         <div v-if="qrUrl" style="text-align: center">
           <img :src="qrUrl" alt="支付二维码" style="width: 230px; height: 230px" />
@@ -52,7 +56,7 @@
           <el-alert v-if="payMode === 'MOCK'" type="warning" :closable="false" style="margin-top: 12px; text-align: left"
             title="当前为模拟支付：扫码打开的是本系统模拟收银台，不会产生真实扣款" />
           <div class="row" style="justify-content: center; margin-top: 14px">
-            <el-button v-if="payMode === 'MOCK'" type="success" plain @click="openMock">打开模拟收银台</el-button>
+            <el-button v-if="payMode === 'MOCK'" type="primary" plain @click="openMock">打开模拟收银台</el-button>
             <el-button @click="cancelOrder">取消订单</el-button>
           </div>
         </div>
@@ -74,6 +78,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import QRCode from 'qrcode'
 import { userApi } from '../../api'
+import { PAY_METHOD_LABEL, money } from '../../utils/status'
 
 const route = useRoute()
 const router = useRouter()

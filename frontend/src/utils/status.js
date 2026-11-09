@@ -53,7 +53,8 @@ export const TASK_STATUS_OPTIONS = Object.entries(TASK_STATUS).map(([value, v]) 
 export const PAY_METHOD_LABEL = { WECHAT: '微信支付', ALIPAY: '支付宝' }
 
 export const COLOR_LABEL = { BW: '黑白', COLOR: '彩色' }
-export const DUPLEX_LABEL = { SINGLE: '单面', DOUBLE: '双面' }
+// 注意：后端枚举是 SINGLE / DUPLEX（早期写成 DOUBLE 会导致界面直接显示英文枚举）
+export const DUPLEX_LABEL = { SINGLE: '单面', DUPLEX: '双面' }
 
 /** 订单是否还能付款 */
 export function payable(order) {

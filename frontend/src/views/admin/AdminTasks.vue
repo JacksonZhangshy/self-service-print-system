@@ -1,5 +1,5 @@
 <template>
-  <div class="page">
+  <div class="page page-xwide">
     <div class="page-wide">
       <div class="card">
         <div class="toolbar">
@@ -12,55 +12,53 @@
           <el-button @click="load(page)">刷新</el-button>
         </div>
 
-        <el-table :data="list" v-loading="loading" size="small" empty-text="暂无任务">
-          <el-table-column label="任务" width="72">
+        <el-table :data="list" v-loading="loading" size="small" empty-text="暂无任务" :fit="false">
+          <el-table-column label="任务" width="62">
             <template #default="{ row }"><span class="mono">#{{ row.taskId }}</span></template>
           </el-table-column>
-          <el-table-column label="状态" width="92">
+          <el-table-column label="状态" width="82">
             <template #default="{ row }">
               <span class="chip" :class="'chip-' + taskStatus(row.status).tone">
                 {{ taskStatus(row.status).label }}
               </span>
             </template>
           </el-table-column>
-          <el-table-column prop="orderNo" label="订单号" width="180" show-overflow-tooltip>
+          <el-table-column prop="orderNo" label="订单号" width="168" show-overflow-tooltip>
             <template #default="{ row }"><span class="mono">{{ row.orderNo }}</span></template>
           </el-table-column>
-          <el-table-column prop="fileName" label="文件" min-width="150" show-overflow-tooltip />
-          <el-table-column label="规格" width="150">
+          <el-table-column prop="fileName" label="文件" width="132" show-overflow-tooltip />
+          <el-table-column label="规格 / 页数" width="148">
             <template #default="{ row }">
               {{ COLOR_LABEL[row.colorMode] }}{{ row.paperSize }}{{ DUPLEX_LABEL[row.duplex] }}
+              <div class="hint">
+                {{ row.pageCount }} 页 × {{ row.copies }} 份
+                <span v-if="row.actualPages" class="mono">（实打 {{ row.actualPages }}）</span>
+              </div>
             </template>
           </el-table-column>
-          <el-table-column label="页数×份" width="96" align="right">
-            <template #default="{ row }">
-              <span class="mono">{{ row.pageCount }}×{{ row.copies }}</span>
-              <div v-if="row.actualPages" class="hint mono">实打 {{ row.actualPages }}</div>
-            </template>
-          </el-table-column>
-          <el-table-column prop="terminalId" label="终端" width="88">
+          <el-table-column prop="terminalId" label="终端" width="66">
             <template #default="{ row }">{{ row.terminalId || '-' }}</template>
           </el-table-column>
-          <el-table-column prop="agentId" label="助手" width="110" show-overflow-tooltip>
+          <el-table-column prop="agentId" label="助手" width="104" show-overflow-tooltip>
             <template #default="{ row }">{{ row.agentId || '-' }}</template>
           </el-table-column>
-          <el-table-column label="重试" width="62" align="center">
+          <el-table-column label="重试" width="56" align="center">
             <template #default="{ row }">
               <span :class="{ warn: row.retryCount > 0 }" class="mono">{{ row.retryCount }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="超时时间" width="146">
+          <el-table-column label="超时时间" width="136">
             <template #default="{ row }">
               <span class="hint" :class="{ overdue: isOverdue(row) }">{{ dt(row.deadlineAt) }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="创建 / 完成" width="180">
+          <el-table-column label="创建 / 完成" width="146">
             <template #default="{ row }">
               <div class="hint">{{ dt(row.createdAt) }}</div>
               <div class="hint" v-if="row.finishedAt">→ {{ dt(row.finishedAt) }}</div>
             </template>
           </el-table-column>
-          <el-table-column prop="failReason" label="失败原因" min-width="140" show-overflow-tooltip />
+          <el-table-column prop="failReason" label="失败原因" width="130" show-overflow-tooltip />
         </el-table>
 
         <div class="pager">

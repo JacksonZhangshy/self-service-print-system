@@ -1,14 +1,17 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-// 开发环境把 /api 与 /mock-pay 代理到后端 8080；生产由 Nginx 反向代理（见部署说明书）
+// 开发环境把 /api 与 /mock-pay 代理到后端；生产由 Nginx 反向代理（见部署说明书）
+// 后端不在本机 8080 时可用环境变量指定：VITE_API_TARGET=http://192.168.1.10:8080 npm run dev
+const apiTarget = process.env.VITE_API_TARGET || 'http://localhost:8080'
+
 export default defineConfig({
   plugins: [vue()],
   server: {
     port: 5173,
     proxy: {
-      '/api': { target: 'http://localhost:8080', changeOrigin: true },
-      '/mock-pay': { target: 'http://localhost:8080', changeOrigin: true }
+      '/api': { target: apiTarget, changeOrigin: true },
+      '/mock-pay': { target: apiTarget, changeOrigin: true }
     }
   },
   build: {
